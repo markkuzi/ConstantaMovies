@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Constanta Movies</string>
+
+    <string name="movies_director">Режиссер :\u0020</string>
+    <string name="movies_actors">Актеры :\u0020</string>
+    <string name="details_movie_start">Фильм\u0020</string>
+    <string name="details_movie_end">\u0020был нажат.</string>
+</resources>

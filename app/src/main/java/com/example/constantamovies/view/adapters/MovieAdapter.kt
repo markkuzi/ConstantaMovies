@@ -1,0 +1,49 @@
+package com.example.constantamovies
+
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.RecyclerView
+import com.example.constantamovies.data.MovieModel
+import com.example.constantamovies.databinding.MovieItemBinding
+
+class MovieAdapter (private val action:(MovieModel)->Unit, var moviesList: ArrayList<MovieModel>):
+    RecyclerView.Adapter<ViewHolder>() {
+
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val layoutInflater = LayoutInflater.from(parent.context)
+        val binding: MovieItemBinding =
+            DataBindingUtil.inflate(layoutInflater, R.layout.movie_item, parent, false)
+        return ViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        holder.bind(moviesList[position], action)
+    }
+
+    override fun getItemCount(): Int {
+        return moviesList.size
+    }
+}
+
+class ViewHolder(val binding: MovieItemBinding) : RecyclerView.ViewHolder(binding.root) {
+
+    fun bind(movieModel: MovieModel, action: (MovieModel) -> Unit) {
+        binding.mTitle.text = movieModel.title
+
+        val directorNameSet = movieModel.directorName.split(" ")
+        val directorName = directorNameSet[2] + " " + directorNameSet[0][0] + "." + directorNameSet[1][0] + "."
+
+        binding.mDirectorName.text = directorName
+        binding.mReleaseYear.text = "(" + movieModel.releaseYear.toString() + ")"
+        binding.mActors.text = movieModel.actors.replace("{","").replace("}","")
+
+        binding.mCard.setOnClickListener(View.OnClickListener {
+            action(movieModel)
+        })
+
+
+    }
+}
