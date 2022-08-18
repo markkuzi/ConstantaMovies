@@ -1,7 +1,7 @@
 # ConstantaMovies
 Тестовое задание для компании Constanta
 
-Необходимо создать Android приложение, которое отображает список фильмов, который доступен в формате JSON по ссылке films.json
+Необходимо создать Android приложение, которое отображает список фильмов, который доступен в формате JSON по ссылке [films.json](https://raw.githubusercontent.com/constanta-android-dev/intership-wellcome-task/main/films.json)
 
 Требования:
 
