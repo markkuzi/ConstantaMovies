@@ -3,28 +3,53 @@ package com.example.constantamovies
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.collection.ArraySet
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.example.constantamovies.data.MovieData
 import com.example.constantamovies.data.MovieModel
 import com.example.constantamovies.databinding.MovieItemBinding
 
-class MovieAdapter (private val action:(MovieModel)->Unit, var moviesList: ArrayList<MovieModel>):
+class MovieAdapter (private val action:(MovieModel)->Unit):
     RecyclerView.Adapter<ViewHolder>() {
 
+    private val movieList = ArrayList<MovieModel>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
         val binding: MovieItemBinding =
             DataBindingUtil.inflate(layoutInflater, R.layout.movie_item, parent, false)
+
         return ViewHolder(binding)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.bind(moviesList[position], action)
+        holder.bind(movieList[position], action)
     }
 
     override fun getItemCount(): Int {
-        return moviesList.size
+        return movieList.size
+    }
+
+    fun setList(products: List<MovieData?>){
+        movieList.clear()
+        for (i in products.indices){
+            val title = products[i]?.title.toString()
+            val directorName = products[i]?.directorName.toString()
+            val releaseYear = products[i]?.releaseYear!!.toInt()
+
+            val actorsList:MutableSet<String> = ArraySet()
+
+            for (actorName in 0 until products[i]?.actors!!.size) {
+                val actor = products[i]!!.actors[actorName].actorName
+                actorsList.add(actor)
+            }
+            val actors = actorsList.toString()
+            val userDetailsTest =
+                MovieModel(title, directorName, releaseYear, actors)
+            movieList.add(userDetailsTest)
+        }
+        movieList.sortBy { it.releaseYear }
     }
 }
 

@@ -17,6 +17,7 @@ import com.example.constantamovies.data.MoviesData
 import com.example.constantamovies.databinding.MoviesBinding
 import com.example.constantamovies.model.repository.MoviesDBRepository
 import com.example.constantamovies.model.repository.MoviesDBRepositoryImpl
+import com.example.constantamovies.viewmodel.MoviesViewModel
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -24,9 +25,9 @@ import retrofit2.Response
 
 class Movies : Fragment() {
 
-    private var binding: MoviesBinding? = null
+    private var binding : MoviesBinding? = null
     private var movieAdapter: MovieAdapter? = null
-    private val mMoviesRepository: MoviesDBRepository = MoviesDBRepositoryImpl()
+    private val moviesViewModel : MoviesViewModel = MoviesViewModel()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,53 +35,28 @@ class Movies : Fragment() {
     ): View? {
 
         binding = DataBindingUtil.inflate(inflater, R.layout.movies, container, false)
-
-        getMovies()
+        moviesViewModel.getMovies()
+        initObservers()
+        initRecyclerView()
 
         return binding?.root
     }
 
-    private fun getMovies(){
+    private fun initRecyclerView(){
+        binding?.mMovieList?.layoutManager = LinearLayoutManager(requireContext())
+        movieAdapter = MovieAdapter({movieModel: MovieModel->action(movieModel)}) //
+        binding?.mMovieList?.adapter = movieAdapter
+    }
 
-        val response = mMoviesRepository.getMovies()
-
-        response.enqueue( object : Callback<MoviesData> {
-            override fun onResponse(call: Call<MoviesData>?, response: Response<MoviesData>?) {
-                Log.d("TestLogs", "OnResponseSuccess ${response?.body()?.items}")
-                val moviesList: ArrayList<MovieModel> = ArrayList()
-
-                for (i in 0 until response?.body()?.items?.size!!){
-                    val items = response.body()?.items
-                    val title = items?.get(i)?.title.toString()
-                    val directorName = items?.get(i)?.directorName.toString()
-                    val releaseYear = items?.get(i)?.releaseYear?.toInt()!!
-
-                    val actorSet:MutableSet<String> = ArraySet()
-
-                    for (name in 0 until items[i].actors.size) {
-                        val actor = items[i].actors[name].actorName
-                        actorSet.add(actor)
-                    }
-                    val actors = actorSet.toString()
-
-                    val movesDetails =
-                        MovieModel(title, directorName, releaseYear, actors)
-                    moviesList.add(movesDetails)
-                }
-
-                moviesList.sortBy { it.releaseYear }
-
-                binding?.mMovieList?.layoutManager = LinearLayoutManager(context)
-                movieAdapter = MovieAdapter({userModel: MovieModel->action(userModel)}, moviesList)
-                binding?.mMovieList?.adapter = movieAdapter
+    private fun initObservers(){
+        moviesViewModel.apply {
+            movies.observe(requireActivity()){
+                movieAdapter?.setList(it)
+                movieAdapter?.notifyDataSetChanged()
 
             }
-
-            override fun onFailure(call: Call<MoviesData>?, t: Throwable?) {
-                Log.d("TestLogs", "OnFailure: $t")
-
-            }
-        })}
+        }
+    }
 
     private fun action(movieModel: MovieModel){
 
